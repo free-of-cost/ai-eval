@@ -1,0 +1,2436 @@
+#Given two jugs- a 4 litre and 3 litre capacity. Neither has any measurable markers on it. There
+is a pump which can be used to fill the jugs with water. Simulate the procedure in Python to get
+exactly 2 litre of water into 4-litre jug
+
+import copy
+
+class MyWaterJug:
+    def __init__(self, startState, goalState):
+        self.currentState=startState
+        self.goalState=goalState
+        self.prevState=None
+
+    def fillFirstJug(self):
+        if self.currentState[0]<4:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=4
+            print("fillFirstJug")
+            return True
+        else:
+            #print("Cannot fill")
+            return False
+
+    def fillSecondJug(self):
+        if self.currentState[1]<3:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[1]=3
+            print("fillSecondJug")
+            return True
+        else:
+            #print("Cannot fill")
+            return False
+
+    def emptyFirstJug(self):
+        if self.currentState[0]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=0
+            print("emptyFirstJug")
+            return True
+        else:
+            #print("Cannot empty")
+            return False
+
+    def emptySecondJug(self):
+        if self.currentState[1]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[1]=0
+            print("emptySecondJug")
+            return True
+        else:
+            #print("Cannot empty")
+            return False
+
+    def transferToFillFirst(self):
+        sum=self.currentState[0]+self.currentState[1]
+        if sum>0 and sum>=4 and self.currentState[1]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[1]=self.currentState[1]-( 4-self.currentState[0] )
+            self.currentState[0]=4
+            print("transferToFillFirstJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def transferToFillSecond(self):
+        sum=self.currentState[0]+self.currentState[1]
+        if sum>0 and sum>=3 and self.currentState[0]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=self.currentState[0]-( 3-self.currentState[1] )
+            self.currentState[1]=3
+            print("transferToFillSecondJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def transferAllToFirst(self):
+        sum=self.currentState[0]+self.currentState[1]
+        if sum>0 and sum<=4 and self.currentState[1]>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=sum
+            self.currentState[1]=0
+            print("transferAllToFirstJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def transferAllToSecond(self):
+        sum=self.currentState[0]+self.currentState[1]
+        if sum>0 and sum<=3 and self.currentState[0]>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=0
+            self.currentState[1]=sum
+            print("transferAllToSecondJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def pourSomeOutOfFirst(self, d):
+        if self.currentState[0]-d>0 and d>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=self.currentState[0]-d
+            print("pourSomeOutOfFirstJug ", d)
+            return True
+        else:
+            #print("Cannot pour out")
+            return False
+
+    def pourSomeOutOfSecond(self, d):
+        if self.currentState[1]-d>0 and d>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[1]=self.currentState[1]-d
+            print("pourSomeOutOfSecondJug ", d)
+            return True
+        else:
+            #print("Cannot pour out")
+            return False
+
+    def displayState(self):
+        print("------------------------------------------")
+        print(self.currentState)
+
+    def isGoalReached(self):
+        if self.currentState[0]==self.goalState:
+            return True
+        else:
+            return False
+
+    def _eq_(self, other):
+        return self.currentState==other.currentState
+
+    def possibleNextStates(self):
+        stateList=[]
+        
+        fillFirstJug_state=copy.deepcopy(self)
+        if fillFirstJug_state.fillFirstJug():
+            stateList.append(fillFirstJug_state)
+
+        fillSecondJug_state=copy.deepcopy(self)
+        if fillSecondJug_state.fillSecondJug():
+            stateList.append(fillSecondJug_state)
+
+        emptyFirstJug_state=copy.deepcopy(self)
+        if emptyFirstJug_state.emptyFirstJug():
+            stateList.append(emptyFirstJug_state)
+
+        emptySecondJug_state=copy.deepcopy(self)
+        if emptySecondJug_state.emptySecondJug():
+            stateList.append(emptySecondJug_state)
+
+        transferToFillFirstJug_state=copy.deepcopy(self)
+        if transferToFillFirstJug_state.transferToFillFirst():
+            stateList.append(transferToFillFirstJug_state)
+
+        transferToFillSecondJug_state=copy.deepcopy(self)
+        if transferToFillSecondJug_state.transferToFillSecond():
+            stateList.append(transferToFillSecondJug_state)
+
+        transferAllToFirstJug_state=copy.deepcopy(self)
+        if transferAllToFirstJug_state.transferAllToFirst():
+            stateList.append(transferAllToFirstJug_state)
+
+        transferAllToSecondJug_state=copy.deepcopy(self)
+        if transferAllToSecondJug_state.transferAllToSecond():
+            stateList.append(transferAllToSecondJug_state)
+
+        for i in range (0, 5):
+            pourSomeOutOfFirstJug_state=copy.deepcopy(self)
+            if pourSomeOutOfFirstJug_state.pourSomeOutOfFirst(i):
+                stateList.append(pourSomeOutOfFirstJug_state)
+
+        for i in range (0, 4):
+            pourSomeOutOfSecondJug_state=copy.deepcopy(self)
+            if pourSomeOutOfSecondJug_state.pourSomeOutOfSecond(i):
+                stateList.append(pourSomeOutOfSecondJug_state)
+
+        return stateList
+
+def constructPath(goalState):
+    print("The solution path from Goal to Start")
+    while goalState is not None:
+        goalState.displayState()
+        goalState=goalState.prevState
+
+def BFS(startState):
+    open=[]
+    closed=[]
+    open.append(startState)
+    while open:
+        print(len(open), len(closed))
+        thisState=open.pop(0)
+        #pop(0) -- queue for bfs
+        #pop    -- stack for dfs
+        thisState.displayState()
+        if thisState not in closed:
+            closed.append(thisState)
+            if thisState.isGoalReached():
+                print("Goal state found.. stopping search")
+                constructPath(thisState)
+                break
+            nextStates=thisState.possibleNextStates()
+            for eachState in nextStates:
+                if eachState not in closed and eachState not in open:
+                    open.append(eachState)
+
+                    
+start=[0, 0]
+goal=2
+
+problem=MyWaterJug(start, goal)
+BFS(problem)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Given three jugs: 12, 8 and 5 liter capacities. Largest jug is completely filled. Using these 3 jugs,
+split the water to obtain exactly 6 liter in largest jugs.
+
+import copy
+
+class MyWaterJug:
+    def __init__(self, startState, goalState):
+        self.currentState=startState
+        self.goalState=goalState
+        self.prevState=None
+
+    def B2A_transferToFillFirst(self):
+        sum=self.currentState[0]+self.currentState[1]
+        if sum>0 and sum>=12 and self.currentState[1]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[1]=self.currentState[1]-( 12-self.currentState[0])
+            self.currentState[0]=12
+            print("B2A_transferToFillFirstJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def C2A_transferToFillFirst(self):
+        sum=self.currentState[0]+self.currentState[2]
+        if sum>0 and sum>=12 and self.currentState[2]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[2]=self.currentState[2]-( 12-self.currentState[0])
+            self.currentState[0]=12
+            print("C2A_transferToFillFirstJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def A2B_transferToFillSecond(self):
+        sum=self.currentState[0]+self.currentState[1]
+        if sum>0 and sum>=8 and self.currentState[0]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=self.currentState[0]-( 8-self.currentState[1] )
+            self.currentState[1]=8
+            print("A2B_transferToFillSecondJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def C2B_transferToFillSecond(self):
+        sum=self.currentState[1]+self.currentState[2]
+        if sum>0 and sum>=8 and self.currentState[2]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[2]=self.currentState[2]-( 8-self.currentState[1] )
+            self.currentState[1]=8
+            print("C2B_transferToFillSecondJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def A2C_transferToFillThird(self):
+        sum=self.currentState[0]+self.currentState[2]
+        if sum>0 and sum>=5 and self.currentState[0]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=self.currentState[0]-( 5-self.currentState[2] )
+            self.currentState[2]=5
+            print("A2C_transferToFillThirdJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def B2C_transferToFillThird(self):
+        sum=self.currentState[1]+self.currentState[2]
+        if sum>0 and sum>=5 and self.currentState[1]>0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[1]=self.currentState[1]-( 5-self.currentState[2] )
+            self.currentState[2]=5
+            print("B2C_transferToFillThirdJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def B2A_transferSomeToFirst(self, d):
+        if d>0 and self.currentState[0]+d<=12 and self.currentState[1]-d>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[1]=self.currentState[1]-d
+            self.currentState[0]=self.currentState[0]+d
+            print("B2A_transferToFillFirstJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def C2A_transferSomeToFirst(self, d):
+        if d>0 and self.currentState[0]+d<=12 and self.currentState[2]-d>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[2]=self.currentState[2]-d
+            self.currentState[0]=self.currentState[0]+d
+            print("C2A_transferSomeToFirstJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def A2B_transferSomeToSecond(self, d):
+        if d>0 and self.currentState[1]+d<=8 and self.currentState[0]-d>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=self.currentState[0]-d
+            self.currentState[1]=self.currentState[1]+d
+            print("A2B_transferSometoSecondJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+    
+    def C2B_transferSomeToSecond(self, d):
+        if d>0 and self.currentState[1]+d<=8 and self.currentState[2]-d>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[2]=self.currentState[2]-d
+            self.currentState[1]=self.currentState[1]+d
+            print("C2B_transferSometoSecondJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+        
+    def A2C_transferSomeToThird(self, d):
+        if d>0 and self.currentState[2]+d<=5 and self.currentState[0]-d>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=self.currentState[0]-d
+            self.currentState[2]=self.currentState[2]+d
+            print("A2C_transferSometoThirdJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    
+    def B2C_transferSomeToThird(self, d):
+        if d>0 and self.currentState[2]+d<=5 and self.currentState[1]-d>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[1]=self.currentState[1]-d
+            self.currentState[2]=self.currentState[2]+d
+            print("B2C_transferSometoThirdJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def transferAllToFirst(self):
+        sum=self.currentState[0]+self.currentState[1]+self.currentState[2]
+        if sum>0 and sum<=12 and self.currentState[1]>=0 and self.currentState[2]>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=sum
+            self.currentState[1]=0
+            self.currentState[2]=0
+            print("transferAllToFirstJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def transferAllToSecond(self):
+        sum=self.currentState[0]+self.currentState[1]+self.currentState[2]
+        if sum>0 and sum<=8 and self.currentState[0]>=0 and self.currentState[2]>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=0
+            self.currentState[1]=sum
+            self.currentState[2]=0
+            print("transferAllToSecondJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def transferAllToThird(self):
+        sum=self.currentState[0]+self.currentState[1]+self.currentState[2]
+        if sum>0 and sum<=5 and self.currentState[0]>=0 and self.currentState[1]>=0:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[0]=0
+            self.currentState[1]=0
+            self.currentState[2]=sum
+            print("transferAllToThirdJug")
+            return True
+        else:
+            #print("Cannot transfer")
+            return False
+
+    def displayState(self):
+        print("------------------------------------------")
+        print(self.currentState)
+
+    def isGoalReached(self):
+        if self.currentState[0]==self.goalState and self.currentState[1]==self.goalState:
+            return True
+        else:
+            return False
+
+    def _eq_(self, other):
+        return self.currentState==other.currentState
+
+    def possibleNextStates(self):
+        stateList=[]
+        
+        B2A_transferToFillFirstJug_state=copy.deepcopy(self)
+        if B2A_transferToFillFirstJug_state.B2A_transferToFillFirst():
+            stateList.append(B2A_transferToFillFirstJug_state)
+
+        C2A_transferToFillFirstJug_state=copy.deepcopy(self)
+        if C2A_transferToFillFirstJug_state.C2A_transferToFillFirst():
+            stateList.append(C2A_transferToFillFirstJug_state)
+
+        A2B_transferToFillSecondJug_state=copy.deepcopy(self)
+        if A2B_transferToFillSecondJug_state.A2B_transferToFillSecond():
+            stateList.append(A2B_transferToFillSecondJug_state)
+
+        C2B_transferToFillSecondJug_state=copy.deepcopy(self)
+        if C2B_transferToFillSecondJug_state.C2B_transferToFillSecond():
+            stateList.append(C2B_transferToFillSecondJug_state)
+
+        A2C_transferToFillThirdJug_state=copy.deepcopy(self)
+        if A2C_transferToFillThirdJug_state.A2C_transferToFillThird():
+            stateList.append(A2C_transferToFillThirdJug_state)
+
+        B2C_transferToFillThirdJug_state=copy.deepcopy(self)
+        if B2C_transferToFillThirdJug_state.B2C_transferToFillThird():
+            stateList.append(B2C_transferToFillThirdJug_state)
+            
+        for d in range (0, 13):
+            B2A_transferSomeToFillFirstJug_state=copy.deepcopy(self)
+            if B2A_transferSomeToFillFirstJug_state.B2A_transferSomeToFirst(d):
+                stateList.append(B2A_transferSomeToFillFirstJug_state)
+            
+            C2A_transferSomeToFillFirstJug_state=copy.deepcopy(self)
+            if C2A_transferSomeToFillFirstJug_state.C2A_transferSomeToFirst(d):
+                stateList.append(C2A_transferSomeToFillFirstJug_state)
+
+            A2B_transferSomeToFillFirstJug_state=copy.deepcopy(self)
+            if A2B_transferSomeToFillFirstJug_state.A2B_transferSomeToSecond(d):
+                stateList.append(A2B_transferSomeToFillFirstJug_state)
+
+            C2B_transferSomeToFillFirstJug_state=copy.deepcopy(self)
+            if C2B_transferSomeToFillFirstJug_state.C2B_transferSomeToSecond(d):
+                stateList.append(C2B_transferSomeToFillFirstJug_state)
+
+            A2C_transferSomeToFillFirstJug_state=copy.deepcopy(self)
+            if A2C_transferSomeToFillFirstJug_state.A2C_transferSomeToThird(d):
+                stateList.append(A2C_transferSomeToFillFirstJug_state)
+        
+            B2C_transferSomeToFillFirstJug_state=copy.deepcopy(self)
+            if B2C_transferSomeToFillFirstJug_state.B2C_transferSomeToThird(d):
+                stateList.append(B2C_transferSomeToFillFirstJug_state)
+
+        transferAllToFirstJug_state=copy.deepcopy(self)
+        if transferAllToFirstJug_state.transferAllToFirst():
+            stateList.append(transferAllToFirstJug_state)
+
+        transferAllToSecondJug_state=copy.deepcopy(self)
+        if transferAllToSecondJug_state.transferAllToSecond():
+            stateList.append(transferAllToSecondJug_state)
+
+        transferAllToThirdJug_state=copy.deepcopy(self)
+        if transferAllToThirdJug_state.transferAllToThird():
+            stateList.append(transferAllToThirdJug_state)
+
+        return stateList
+
+def constructPath(goalState):
+    print("The solution path from Goal to Start")
+    while goalState is not None:
+        goalState.displayState()
+        goalState=goalState.prevState
+
+def BFS(startState):
+    open=[]
+    closed=[]
+    open.append(startState)
+    while open:
+        print(len(open), len(closed))
+        thisState=open.pop(0)
+        #pop(0) -- queue for bfs
+        #pop    -- stack for dfs
+        thisState.displayState()
+        if thisState not in closed:
+            closed.append(thisState)
+            if thisState.isGoalReached():
+                print("Goal state found.. stopping search")
+                constructPath(thisState)
+                break
+            nextStates=thisState.possibleNextStates()
+            for eachState in nextStates:
+                if eachState not in closed and eachState not in open:
+                    open.append(eachState)
+
+                    
+start=[12, 0, 0]
+goal=6
+
+problem=MyWaterJug(start, goal)
+BFS(problem)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Write a code in python for the 8 puzzle problem by taking the following initial and final states.
+
+import copy
+
+class MyEightPuzzle:
+    def __init__(self, startState, goalState):
+        self.currentState=startState
+        self.goalState=goalState
+        self.emptyIndex=self.emptyTileIndex()
+        self.prevState=None
+
+    def up(self):
+        if self.emptyIndex==6 or self.emptyIndex==7 or self.emptyIndex==8:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex+3]
+            self.currentState[self.emptyIndex+3]=0
+            self.emptyIndex=self.emptyIndex+3
+            #print("Action : UP")
+            return True
+
+    def down(self):
+        if self.emptyIndex==0 or self.emptyIndex==1 or self.emptyIndex==2:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex-3]
+            self.currentState[self.emptyIndex-3]=0
+            self.emptyIndex=self.emptyIndex-3
+            #print("Action : DOWN")
+            return True
+            
+    def left(self):
+        if self.emptyIndex==2 or self.emptyIndex==5 or self.emptyIndex==8:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex+1]
+            self.currentState[self.emptyIndex+1]=0
+            self.emptyIndex=self.emptyIndex+1
+            #print("Action : LEFT")
+            return True
+
+    def right(self):
+        if self.emptyIndex==0 or self.emptyIndex==3 or self.emptyIndex==6:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex-1]
+            self.currentState[self.emptyIndex-1]=0
+            self.emptyIndex=self.emptyIndex-1
+            #print("Action : RIGHT")
+            return True
+
+    def displayState(self):
+        print("-------------------------------------")
+        for i in range(0, 8, 3):
+            print(self.currentState[i], self.currentState[i+1], self.currentState[i+2])
+        
+    def emptyTileIndex(self):
+        for i in range(0, 9):
+            if self.currentState[i]==0:
+                return i
+    
+    def isGoalReached(self):
+        if self.currentState==self.goalState:
+            return True
+        else:
+            return False
+
+    def _eq_(self, other):
+        return self.currentState==other.currentState
+
+    def possibleNextStates(self):
+        stateList=[]
+        
+        up_state=copy.deepcopy(self)
+        if up_state.up():
+            stateList.append(up_state)
+
+        down_state=copy.deepcopy(self)
+        if down_state.down():
+            stateList.append(down_state)
+            
+        left_state=copy.deepcopy(self)
+        if left_state.left():
+            stateList.append(left_state)
+
+        right_state=copy.deepcopy(self)
+        if right_state.right():
+            stateList.append(right_state)
+
+        return stateList
+
+def constructPath(goalState):
+    print("The solution path from Goal to Start")
+    while goalState is not None:
+        goalState.displayState()
+        goalState=goalState.prevState
+
+def BFS(startState):
+    open=[]
+    closed=[]
+    open.append(startState)
+    while open:
+        print(len(open), len(closed))
+        thisState=open.pop(0)
+        #pop(0) -- queue for bfs
+        #pop    -- stack for dfs
+        thisState.displayState()
+        if thisState not in closed:
+            closed.append(thisState)
+            if thisState.isGoalReached():
+                print("Goal state found.. stopping search")
+                constructPath(thisState)
+                break
+            nextStates=thisState.possibleNextStates()
+            for eachState in nextStates:
+                if eachState not in closed and eachState not in open:
+                    open.append(eachState)
+
+
+
+#start=[7, 2, 4, 5, 0, 6, 8, 3, 1]
+#goal=[0, 1, 2, 3, 4, 5, 6, 7, 8]
+
+
+start=  [2, 8, 1, 0, 4, 3, 7, 6, 5]
+goal=   [1, 2, 3, 8, 0, 4, 7, 6, 5]
+problem=MyEightPuzzle(start, goal)
+BFS(problem)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Write a Python program to implement Travelling Salesman Problem (TSP). Take the starting
+node from the user at run time.
+
+
+import copy
+class TSP:
+    def __init__(self, map, startCity):
+        TSP.map=map
+        self.startCity=startCity
+        self.currentCity=startCity
+        self.cost=0
+        self.visitedList=[]
+        self.visitedList.append(self.currentCity)
+        self.prevState=None
+
+    def displayState(self):
+        print("--------------------------------")
+        print(f"Current city:{self.currentCity}     Visited cities={self.visitedList}     Cost={self.cost}")
+
+    def __gt__(self, other):
+        return self.cost>other.cost
+
+    def __lt__(self, other):
+        return self.cost<other.cost
+
+    def __eq__(self, other):
+        return self.visitedList==other.visitedList
+
+    def isGoalReached(self):
+        if len(TSP.map[0])+1==len(self.visitedList):
+            return True
+        else:
+            return False
+
+    def move(self, city):
+        if city!=self.currentCity and city not in self.visitedList:
+            print(f"Moving from city {self.currentCity} to {city}")
+            self.cost+=TSP.map[self.currentCity][city]
+            self.currentCity=city
+            self.visitedList.append(self.currentCity)
+            return True
+        elif len(self.visitedList)==len(TSP.map[0]):
+            print(f"Moving from city {self.currentCity} to {self.startCity}")
+            self.cost+=TSP.map[self.currentCity][self.startCity]
+            self.currentCity=self.startCity
+            self.visitedList.append(self.startCity)
+            return True
+        else:
+            print("Already visited")
+            return False
+
+    def possibleNextStates(self):
+        stateList=[]
+        for i in range(0, len(TSP.map[0])):
+            state=copy.deepcopy(self)
+            self.prevState=copy.deepcopy(self)
+            if state.move(i):
+                stateList.append(state)
+        return stateList
+
+def constructPath(goalState):
+    print("The solution path from Goal to Start")
+    while goalState is not None:
+        goalState.displayState()
+        goalState=goalState.prevState
+
+open=[]
+closed=[]
+def UCS(state):
+    open.append(state)
+    while(open):
+        thisState=open.pop(0)
+        thisState.displayState()
+        if thisState not in closed:
+            closed.append(thisState)
+            if thisState.isGoalReached():
+                print("Goal state found.. stopping search")
+                constructPath(thisState)
+                break   
+            else:
+                nextStates=thisState.possibleNextStates()
+                for eachState in nextStates:
+                    if eachState not in open and eachState not in closed:
+                        open.append(eachState)
+                        open.sort()
+                    elif eachState in open:
+                        index=open.index(eachState)
+                        if open[index].cost>eachState.cost:
+                            open.pop(index)
+                            open.append(eachState)
+                            open.sort()
+                    elif eachState in closed:
+                        index=closed.index(eachState)
+                        if closed[index].cost>eachState.cost:
+                            closed.pop(index)
+                            closed.append(eachState)
+                            propogateImprovement(eachState)
+
+def propogateImprovement(state):
+    nextStates=state.possibleNextStates()
+    for eachState in nextStates:
+        if eachState in open:
+            index=open.index[eachState]
+            if open[index].cost>eachState.cost:
+                open.pop(index)
+                open.append(eachState)
+                open.sort()
+            if eachState in closed:
+                index=closed.index(eachState)
+                if closed[index].cost>eachState.cost:
+                    closed.pop(index)
+                    closed.append(eachState)
+                    propogateImprovement(eachState)
+
+map=[[0, 10, 15, 20], [10, 0, 35, 25], [15, 35, 0, 30], [20, 25, 30, 0]]
+start=int(input("Enter the start city "))
+problem=TSP(map, start)
+UCS(problem)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Assgn 3
+
+#If the initial and final states are as below, find the value of Heuristic function, by taking
+
+#(i) Euclidean Distance
+#(ii) Manhattan Distance
+#(iii) Minkowski Distance
+
+from cmath import sqrt
+
+class MyEightPuzzle:
+    def __init__(self, startState, goalState, startState2D, goalState2D):
+        self.startState=startState
+        self.goalState=goalState
+        self.startState2D=startState2D
+        self.goalState2D=goalState2D
+
+    def euclidean(self):
+        sum=0
+        for i in range(0, 3):
+            for j in range(0, 3):
+                goalNode=self.goalState2D[i][j]
+                if goalNode==0:
+                    continue
+                goalIndexX=i
+                goalIndexY=j
+
+                for k in range(0, 3):
+                    for l in range(0, 3):
+                        startNode=self.startState2D[k][l]
+                        if startNode==goalNode:
+                            startIndexX=k
+                            startIndexY=l
+                            break
+                
+                x=abs(goalIndexX-startIndexX)
+                y=abs(goalIndexY-startIndexY)
+                distance=sqrt( pow(x, 2) + pow(y, 2) )
+                sum+=distance
+                print(f"Euclidean distance for {goalNode} is {distance}")
+        print(f"Heuristic function value for Euclidean distance={sum}")
+        
+    def manhattan(self):
+        sum=0
+        for i in range(0, 9):
+            
+            goalNode=self.goalState[i]
+            if goalNode==0:
+                continue
+            goalIndex=i
+
+            for j in range(0, 9):
+                startNode=self.startState[j]
+                if startNode==goalNode:
+                    startIndex=j
+                    break
+            
+            difference=abs(goalIndex-startIndex)
+            if difference<3:
+                moves=difference
+            elif difference>=3 and difference<6:
+                moves=difference%3 + 1
+            elif difference>=6 and difference<8:
+                moves=difference%3 + 2
+            sum+=moves
+            print(f"Manhattan distance for {self.goalState[i]} is {moves}")
+        print(f"Heuristic function value for Manhattan distance={sum}")
+            
+    def minkowski(self):
+        sum=0
+        p=float(input("Enter p: "))
+
+        for i in range(0, 3):
+            for j in range(0, 3):
+                goalNode=self.goalState2D[i][j]
+                if goalNode==0:
+                    continue
+                goalIndexX=i
+                goalIndexY=j
+
+                for k in range(0, 3):
+                    for l in range(0, 3):
+                        startNode=self.startState2D[k][l]
+                        if startNode==goalNode:
+                            startIndexX=k
+                            startIndexY=l
+                            break
+                
+                x=abs(goalIndexX-startIndexX)
+                y=abs(goalIndexY-startIndexY)
+                distance=pow( pow(x, p) + pow(y, p), 1/p )
+                sum+=distance
+                print(f"Minkowski distance for {goalNode} is {distance}")
+        print(f"Heuristic function value for Minkowski distance={sum}")
+        
+
+start=[2, 0, 3, 1, 8, 4, 7, 6, 5]
+goal= [1, 2, 3, 8, 0, 4, 7, 6, 5]
+start2D=[[2, 0, 3], [1, 8, 4], [7, 6, 5]]
+goal2D= [[1, 2, 3], [8, 0, 4], [7, 6, 5]]
+problem=MyEightPuzzle(start, goal, start2D, goal2D)
+
+problem.euclidean()
+problem.manhattan()
+problem.minkowski()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#If the initial and final states are as below and H(n): number of misplaced tiles in the current state
+n as compared to the goal node need to be considered as the heuristic function. You need to use
+BestFirst Search algorithm.
+
+
+
+
+
+import copy
+
+class MyEightPuzzle:
+    def __init__(self, startState, goalState):
+        self.currentState=startState
+        self.goalState=goalState
+        self.emptyIndex=self.emptyTileIndex()
+        self.prevState=None
+
+    def up(self):
+        if self.emptyIndex==6 or self.emptyIndex==7 or self.emptyIndex==8:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex+3]
+            self.currentState[self.emptyIndex+3]=0
+            self.emptyIndex=self.emptyIndex+3
+            #print("Action : UP")
+            return True
+
+    def down(self):
+        if self.emptyIndex==0 or self.emptyIndex==1 or self.emptyIndex==2:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex-3]
+            self.currentState[self.emptyIndex-3]=0
+            self.emptyIndex=self.emptyIndex-3
+            #print("Action : DOWN")
+            return True
+            
+    def left(self):
+        if self.emptyIndex==2 or self.emptyIndex==5 or self.emptyIndex==8:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex+1]
+            self.currentState[self.emptyIndex+1]=0
+            self.emptyIndex=self.emptyIndex+1
+            #print("Action : LEFT")
+            return True
+
+    def right(self):
+        if self.emptyIndex==0 or self.emptyIndex==3 or self.emptyIndex==6:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex-1]
+            self.currentState[self.emptyIndex-1]=0
+            self.emptyIndex=self.emptyIndex-1
+            #print("Action : RIGHT")
+            return True
+
+    def displayState(self):
+        print("-------------------------------------")
+        for i in range(0, 8, 3):
+            print(self.currentState[i], self.currentState[i+1], self.currentState[i+2])
+        
+    def emptyTileIndex(self):
+        for i in range(0, 9):
+            if self.currentState[i]==0:
+                return i
+    
+    def isGoalReached(self):
+        if self.currentState==self.goalState:
+            return True
+        else:
+            return False
+
+    def _eq_(self, other):
+        return self.currentState==other.currentState
+
+    def possibleNextStates(self):
+        stateList=[]
+        
+        up_state=copy.deepcopy(self)
+        if up_state.up():
+            stateList.append(up_state)
+
+        down_state=copy.deepcopy(self)
+        if down_state.down():
+            stateList.append(down_state)
+            
+        left_state=copy.deepcopy(self)
+        if left_state.left():
+            stateList.append(left_state)
+
+        right_state=copy.deepcopy(self)
+        if right_state.right():
+            stateList.append(right_state)
+
+        return stateList
+
+def heuristic(self):
+    count=0
+    for i in range(0, 9):
+        if self.goalState[i]!=self.currentState[i] and self.goalState[i]!=0:
+            count=count+1
+    return count
+
+def constructPath(goalState):
+    print("The solution path from Goal to Start")
+    while goalState is not None:
+        goalState.displayState()
+        goalState=goalState.prevState
+
+def BestFirstSearch(startState):
+    open=[]
+    closed=[]
+    
+    #Step 1
+    open.append(startState)
+
+    #Step 2
+    while open:
+
+        #Step 3
+        thisState=open.pop(0)
+        thisState.displayState()
+        closed.append(thisState)
+
+        #Step 4
+        if thisState.isGoalReached():
+            print("Goal state found.. stopping search")
+            constructPath(thisState)
+            break
+
+        #Step 5
+        nextStates=thisState.possibleNextStates()
+
+        #Step 6
+        for eachState in nextStates:
+            if eachState not in open and eachState not in closed:
+                open.append(eachState)
+                open.sort(key=heuristic)
+
+
+start=[2, 0, 3, 1, 8, 4, 7, 6, 5]
+goal= [1, 2, 3, 8, 0, 4, 7, 6, 5]
+problem=MyEightPuzzle(start, goal)
+BestFirstSearch(problem)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#If the initial and final states are as below and H(n): number of misplaced tiles in the current state
+n as compared to the goal node need to be considered as the heuristic function. You need to use
+Hill Climbing algorithm.
+
+
+
+import copy
+
+class MyEightPuzzle:
+    def __init__(self, startState, goalState):
+        self.currentState=startState
+        self.goalState=goalState
+        self.emptyIndex=self.emptyTileIndex()
+        self.prevState=None
+
+    def up(self):
+        if self.emptyIndex==6 or self.emptyIndex==7 or self.emptyIndex==8:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex+3]
+            self.currentState[self.emptyIndex+3]=0
+            self.emptyIndex=self.emptyIndex+3
+            #print("Action : UP")
+            return True
+
+    def down(self):
+        if self.emptyIndex==0 or self.emptyIndex==1 or self.emptyIndex==2:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex-3]
+            self.currentState[self.emptyIndex-3]=0
+            self.emptyIndex=self.emptyIndex-3
+            #print("Action : DOWN")
+            return True
+            
+    def left(self):
+        if self.emptyIndex==2 or self.emptyIndex==5 or self.emptyIndex==8:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex+1]
+            self.currentState[self.emptyIndex+1]=0
+            self.emptyIndex=self.emptyIndex+1
+            #print("Action : LEFT")
+            return True
+
+    def right(self):
+        if self.emptyIndex==0 or self.emptyIndex==3 or self.emptyIndex==6:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex-1]
+            self.currentState[self.emptyIndex-1]=0
+            self.emptyIndex=self.emptyIndex-1
+            #print("Action : RIGHT")
+            return True
+
+    def displayState(self):
+        print("-------------------------------------")
+        for i in range(0, 8, 3):
+            print(self.currentState[i], self.currentState[i+1], self.currentState[i+2])
+        
+    def emptyTileIndex(self):
+        for i in range(0, 9):
+            if self.currentState[i]==0:
+                return i
+    
+    def isGoalReached(self):
+        if self.currentState==self.goalState:
+            return True
+        else:
+            return False
+
+    def _eq_(self, other):
+        return self.currentState==other.currentState
+
+    def possibleNextStates(self):
+        stateList=[]
+        
+        up_state=copy.deepcopy(self)
+        if up_state.up():
+            stateList.append(up_state)
+
+        down_state=copy.deepcopy(self)
+        if down_state.down():
+            stateList.append(down_state)
+            
+        left_state=copy.deepcopy(self)
+        if left_state.left():
+            stateList.append(left_state)
+
+        right_state=copy.deepcopy(self)
+        if right_state.right():
+            stateList.append(right_state)
+
+        return stateList
+
+    def heuristic(self):
+        count=0
+        for i in range(0, 9):
+            if self.goalState[i]!=self.currentState[i] and self.goalState[i]!=0:
+                count=count+1
+        return count
+
+def constructPath(goalState):
+    print("The solution path from Goal to Start")
+    while goalState is not None:
+        goalState.displayState()
+        goalState=goalState.prevState
+
+def HillClimbing(startState):
+    open=[]
+    closed=[]
+    
+    #Step 1
+    open.append(startState)
+
+    #Step 2
+    while open:
+
+        #
+        thisState=open.pop(0)
+        thisState.displayState()
+
+        #Step 4
+        if thisState.isGoalReached():
+            print("Goal state found.. stopping search")
+            constructPath(thisState)
+            break
+
+        #Step 5
+        nextStates=thisState.possibleNextStates()
+
+        #Step 6
+        for eachState in nextStates:
+            if eachState not in open and eachState not in closed:
+                #If next state is better than current state(lower heuristic value is better)
+                if eachState.heuristic() < thisState.heuristic():
+                    open.append(eachState)
+                    closed.append(thisState)
+
+start=[2, 0, 3, 1, 8, 4, 7, 6, 5]
+goal= [1, 2, 3, 8, 0, 4, 7, 6, 5]
+problem=MyEightPuzzle(start, goal)
+HillClimbing(problem)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#If the initial and final states are as below and H(n): Manhattan distance as the heuristic function.
+You need to use Best First Search algorithm.
+
+import copy
+
+class MyEightPuzzle:
+    def __init__(self, startState, goalState):
+        self.currentState=startState
+        self.goalState=goalState
+        self.emptyIndex=self.emptyTileIndex()
+        self.prevState=None
+
+    def up(self):
+        if self.emptyIndex==6 or self.emptyIndex==7 or self.emptyIndex==8:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex+3]
+            self.currentState[self.emptyIndex+3]=0
+            self.emptyIndex=self.emptyIndex+3
+            #print("Action : UP")
+            return True
+
+    def down(self):
+        if self.emptyIndex==0 or self.emptyIndex==1 or self.emptyIndex==2:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex-3]
+            self.currentState[self.emptyIndex-3]=0
+            self.emptyIndex=self.emptyIndex-3
+            #print("Action : DOWN")
+            return True
+            
+    def left(self):
+        if self.emptyIndex==2 or self.emptyIndex==5 or self.emptyIndex==8:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex+1]
+            self.currentState[self.emptyIndex+1]=0
+            self.emptyIndex=self.emptyIndex+1
+            #print("Action : LEFT")
+            return True
+
+    def right(self):
+        if self.emptyIndex==0 or self.emptyIndex==3 or self.emptyIndex==6:
+            #print("Cannot move")
+            return False
+        else:
+            self.prevState=copy.deepcopy(self)
+            self.currentState[self.emptyIndex]=self.currentState[self.emptyIndex-1]
+            self.currentState[self.emptyIndex-1]=0
+            self.emptyIndex=self.emptyIndex-1
+            #print("Action : RIGHT")
+            return True
+
+    def displayState(self):
+        print("-------------------------------------")
+        for i in range(0, 8, 3):
+            print(self.currentState[i], self.currentState[i+1], self.currentState[i+2])
+        
+    def emptyTileIndex(self):
+        for i in range(0, 9):
+            if self.currentState[i]==0:
+                return i
+    
+    def isGoalReached(self):
+        if self.currentState==self.goalState:
+            return True
+        else:
+            return False
+
+    def _eq_(self, other):
+        return self.currentState==other.currentState
+
+    def possibleNextStates(self):
+        stateList=[]
+        
+        up_state=copy.deepcopy(self)
+        if up_state.up():
+            stateList.append(up_state)
+
+        down_state=copy.deepcopy(self)
+        if down_state.down():
+            stateList.append(down_state)
+            
+        left_state=copy.deepcopy(self)
+        if left_state.left():
+            stateList.append(left_state)
+
+        right_state=copy.deepcopy(self)
+        if right_state.right():
+            stateList.append(right_state)
+
+        return stateList
+
+def heuristic(self):
+    sum=0
+    for i in range(0, 9):
+        
+        goalNode=self.goalState[i]
+        if goalNode==0:
+            continue
+        goalIndex=i
+
+        for j in range(0, 9):
+            currentNode=self.currentState[j]
+            if currentNode==goalNode:
+                currentIndex=j
+                break
+        
+        difference=abs(goalIndex-currentIndex)
+        if difference<3:
+            moves=difference
+        elif difference>=3 and difference<6:
+            moves=difference%3 + 1
+        elif difference>=6 and difference<8:
+            moves=difference%3 + 2
+
+        sum=sum+moves
+        return sum
+
+def constructPath(goalState):
+    print("The solution path from Goal to Start")
+    while goalState is not None:
+        goalState.displayState()
+        goalState=goalState.prevState
+
+def BestFirstSearch(startState):
+    open=[]
+    closed=[]
+    
+    #Step 1
+    open.append(startState)
+
+    #Step 2
+    while open:
+
+        #Step 3
+        thisState=open.pop(0)
+        thisState.displayState()
+        closed.append(thisState)
+
+        #Step 4
+        if thisState.isGoalReached():
+            print("Goal state found.. stopping search")
+            constructPath(thisState)
+            break
+
+        #Step 5
+        nextStates=thisState.possibleNextStates()
+
+        #Step 6
+        for eachState in nextStates:
+            if eachState not in open and eachState not in closed:
+                open.append(eachState)
+                open.sort(key=heuristic)
+
+
+start=[2, 0, 3, 1, 8, 4, 7, 6, 5]
+goal= [1, 2, 3, 8, 0, 4, 7, 6, 5]
+problem=MyEightPuzzle(start, goal)
+BestFirstSearch(problem)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Solve this given problem using Uniform Cost search. A is the initial state and G is the goal state
+
+
+
+
+
+import copy
+
+class MyShortestPath:
+    def __init__(self, map, startCity, goalCity):
+        MyShortestPath.map=map
+        self.currentCity=startCity
+        self.goalCity=goalCity
+        self.cost=0
+        self.visitedList=[]
+        self.visitedList.append(self.currentCity)
+        self.prevState=None
+
+    def displayState(self):
+        print("--------------------------------")
+        print(f"Current city:{self.currentCity}     Visited cities={self.visitedList}     Cost={self.cost}")
+
+    def __gt__(self, other):
+        return self.cost>other.cost
+
+    def __lt__(self, other):
+        return self.cost<other.cost
+
+    def __eq__(self, other):
+        return self.visitedList==other.visitedList
+
+    def isGoalReached(self):
+        if self.goalCity in self.visitedList:
+            return True
+        else:
+            return False
+            
+    def move(self, city):
+        if city!=self.currentCity and city not in self.visitedList and MyShortestPath.map[self.currentCity][city]!=0:
+            print(f"Moving from city {self.currentCity} to {city}")
+            self.cost+=MyShortestPath.map[self.currentCity][city]
+            self.currentCity=city
+            self.visitedList.append(self.currentCity)
+            return True
+        else:
+            print("Already visited")
+            return False
+
+    def possibleNextStates(self):
+        stateList=[]
+        for i in range(0, len(MyShortestPath.map[0])):
+            state=copy.deepcopy(self)
+            if state.move(i):
+                self.prevState=copy.deepcopy(self)
+                stateList.append(state)
+        return stateList
+    
+def constructPath(goalState):
+    print("The solution path from Goal to Start")
+    while goalState is not None:
+        goalState.displayState()
+        goalState=goalState.prevState
+
+open=[]
+closed=[]
+def UCS(state):
+    open.append(state)
+    while(open):
+        thisState=open.pop(0)
+        thisState.displayState()
+        if thisState not in closed:
+            closed.append(thisState)
+            if thisState.isGoalReached():
+                print("Goal state found.. stopping search")
+                constructPath(thisState)
+                break
+            else:
+                nextStates=thisState.possibleNextStates()
+                for eachState in nextStates:
+                    if eachState not in open and eachState not in closed:
+                        open.append(eachState)
+                        open.sort()
+                    elif eachState in open:
+                        index=open.index(eachState)
+                        if open[index].cost>eachState.cost:
+                            open.pop(index)
+                            open.append(eachState)
+                            open.sort()
+                    elif eachState in closed:
+                        index=closed.index(eachState)
+                        if closed[index].cost>eachState.cost:
+                            closed.pop(index)
+                            closed.append(eachState)
+                            propogateImprovement(eachState)
+
+def propogateImprovement(state):
+    nextStates=state.possibleNextStates()
+    for eachState in nextStates:
+        if eachState in open:
+            index=open.index[eachState]
+            if open[index].cost>eachState.cost:
+                open.pop(index)
+                open.append(eachState)
+                open.sort()
+            if eachState in closed:
+                index=closed.index(eachState)
+                if closed[index].cost>eachState.cost:
+                    closed.pop(index)
+                    closed.append(eachState)
+                    propogateImprovement(eachState)
+
+map=[[0, 1, 5, 15, 0], [1, 0, 0, 0, 10], [5, 0, 0, 0, 5], [15, 0, 0, 0, 5], [0, 10, 5, 5, 0]]
+start=0
+goal=4
+problem=MyShortestPath(map, start, goal)
+UCS(problem)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Solve the following blocks world problem using Simple Hill Climbing Algorithm.
+#Let the heuristic be
+#+1 if the block is resting on the correct block and
+#-1 if it is resting on the incorrect block
+
+
+
+# import library to use deepcopy
+import copy 
+# visited states array to keep memory 
+visited = []
+# global variable to store count of steps 
+CountSteps = 0
+# this function calculates the heuristic value 
+def heuristic(curr_State):
+    # the final goal state lies in the stack indexed 3 of the goal state 
+    temp = goal[3]
+    # target stores this final value
+    target = copy.deepcopy(temp)
+    # inserting an elemnet to mark the end of the stack
+    target.insert(0,'Q')
+    ##print("GOAL[3] ",goal[3])
+    ##print("Target: ",target)
+    ##print("current ",curr_State)
+    
+    # this dictionary stores the mapping of the correct element below the current element
+    # this will be used to calculate the heuristic value
+    loc = {'A': target[target.index('A')-1],
+            'B': target[target.index('B')-1],
+            'C': target[target.index('C')-1],
+            'D': target[target.index('D')-1] }
+    ##print ("location ",loc)
+    
+    #initialising the heuristic value to 0
+    h_val =0
+    
+    #iterating over the stacks in the current state
+    for i in range(len(curr_State)):
+        # t is the stack inside the state
+        t = curr_State[i]
+        ttemp = copy.deepcopy(t)
+        # inserting an element to mark the end 
+        ttemp.insert(0,'Q')
+        # this will be used later to store the value of the key value pair of the dictionary
+        h=0
+        #if the length of the stack is more than 1
+        #note we don't use zero here because each stack was inserted with the extra element 'Q'
+        if len(ttemp)>1:
+            ##print("temp ",ttemp)
+            #iterate over this stack
+            for j in range(len(ttemp)-1):
+                ##print("checking", ttemp[j+1])
+                
+                #find the value corresponding to this element
+                # we want to find which value should be below this element
+                for key,value in loc.items():
+                    if key == ttemp[j+1]:
+                        h = value
+                        
+                # if the currect block is underneath then add 1 to the heuristic value
+                if(ttemp[j] == h):
+                    h_val +=1;
+                # else we subtract one from the heuristic value
+                else:
+                    h_val-=1
+    #return the heurustic value 
+    return h_val
+#this function genertaes the next state
+def generate_next(curr_state, prev_heu):
+    state = copy.deepcopy(curr_state)
+    # choose each stack in the given state
+    for i in range(len(state)):
+        # copy the current state in temp variable
+        temp = copy.deepcopy(state)
+        # for each stack in the state, check if length >=1, ie the stack is not empty
+        if len(temp[i]) > 0:
+            # if condition checks, store and then pop the element from this stack
+            elem = temp[i].pop()
+
+            # for each stack in temp: here we start iterating again 
+            for j in range(len(temp)):
+                # create a copy of temp, and create new state
+                temp1 = copy.deepcopy(temp)
+                # check to make sure we don;t append the element at the same place 
+                # from where we remeoved it, thereby forming hte same state
+                if j != i:
+                    # if not the same position then append
+                    temp1[j].append(elem)
+                    # check if the new state is not in visited array 
+                    if (temp1 not in visited):
+                        # find the current heuristic
+                        curr_heu=heuristic(temp1)
+                        # compare the heuristic values
+                        if curr_heu>prev_heu:
+                            # if better solution exists then return the newly created state
+                            return temp1
+    
+    # else since no better soln is possible with respect to the current state,
+    # simply return 0, which means a failure
+    return 0
+def solution():
+    global CountSteps
+    # checking if initial state is already the final state
+    if (initial == goal):
+        print(initial)
+        print("Solution found")
+        Count +=1
+        return 
+    # loop while goal is found or no better optimal solution is possible
+    curr_State = copy.deepcopy(initial)
+    while(True):
+        #if the state is not in the memory 
+        if curr_State not in visited:
+            # add it 
+            visited.append(curr_State)
+            # increment the steps
+            CountSteps+=1
+            #display
+            display(curr_State)
+            # find the current heuristic value
+            prev_heurisitc = heuristic(curr_State)
+            #print("heuristic: ",prev_heurisitc)
+            
+            #find the new state 
+            new_state = generate_next(curr_State,prev_heurisitc)
+            
+            # if no new state feasible 
+            if new_state == 0:
+                #end the code
+                print("END")
+                return
+            # else let this new state be the current state
+            else:
+                curr_State = copy.deepcopy(new_state)
+def display(curr):
+    global CountSteps
+    print("Printing the step ",CountSteps)
+    for i in curr:
+        for j in i:
+            if len(j) > 0:
+                print ( j ,end =' ')
+        print()
+    print("End of state")
+    print ()       
+# inputs
+initial = [[],[],[],['D','C','B','A']]
+goal = [[],[],[],['A','B','C','D']]
+solution()
+print ("*********END*********")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Solve the following blocks world problem using Simple Hill Climbing Algorithm.
+#Take the following heuristic function:
+#+n for block which is resting on the current support structure and n is equal to number
+of blocks below it.
+#-n for block which is resting on the incurrent support structure and n is equal to
+number of blocks below it.
+
+
+
+
+# copy imported to use deepcopy function 
+import copy
+# maintaining a global visited to save all visited and avoid repetition & infinite loop condition
+visitedStates = []
+
+# global variable steps to calulate the step count
+countSteps = 0
+
+# this function defines the heuristic
+def heuristic(curr_state,goalState):
+    # the final stack with respect to which we calculate the heuristic
+    Target=goalState[3]
+    # initially heuristic value is 0
+    val=0
+    # for each stack in the current state
+    for i in range(len(curr_state)):
+        # the first block in the stack
+        check_val=curr_state[i]
+        # check if the stack has any blocks (length more than 0)
+        if len(check_val)>0:
+            # pick each block in the stack one by one
+            for j in range(len(check_val)):
+                # check if it matches corresponding location in the goal state
+                if check_val[j]!=Target[j]:
+                    # if it does not match then subtract j from heuristic value
+                    # val-=1
+                    val-=j
+                else:
+                    # if it matches then add j to heuristic value
+                    # val+=1
+                    val+=j
+    # return the heuristic value
+    return val
+            
+# this function generates the next state            
+def generate_next(curr_state,prev_heu,goalState):
+    state = copy.deepcopy(curr_state)
+    # choose each stack in the given state
+    for i in range(len(state)):
+        # copy the current state in temp variable
+        temp = copy.deepcopy(state)
+        # for each stack in the state, check if length >=1, ie the stack is not empty
+        if len(temp[i]) > 0:
+            # if condition checks, store and then pop the element from this stack
+            elem = temp[i].pop()
+
+            # for each stack in temp: here we start iterating again 
+            for j in range(len(temp)):
+                # create a copy of temp, and create new state
+                temp1 = copy.deepcopy(temp)
+                # check to make sure we don;t append the element at the same place 
+                # from where we remeoved it, thereby forming hte same state
+                if j != i:
+                    # if not the same position then append
+                    temp1[j].append(elem)
+                    # check if the new state is not in visited array 
+                    if (temp1 not in visitedStates):
+                        # find the current heuristic
+                        curr_heu=heuristic(temp1,goalState)
+                        # compare the heuristic values
+                        if curr_heu>prev_heu:
+                            # if better solution exists then return the newly created state
+                            return temp1
+    
+    # else since no better soln is possible with respect to the current state,
+    # simply return 0, which means a failure
+    return 0
+
+def solution_(init_state,goalState):
+    global countSteps
+    global visitedStates
+
+    # checking if initial state is already the final state
+    if (init_state == goalState):
+        print (goalState)
+        print("solution found!")
+        return
+    
+    currentState = copy.deepcopy(init_state)
+    
+    # loop while goal is found or no better optimal solution is possible
+    while(True):
+
+        # add current state to visited to avoid repetition
+        visitedStates.append(copy.deepcopy(currentState))
+        countSteps+=1
+        display(currentState)
+        prev_heu=heuristic(currentState,goalState)
+
+        # generate possible better child from current state
+        child = generate_next(currentState,prev_heu,goalState)
+        
+        # No more better states are possible
+        if child==0:
+            print("Final state - ",currentState)
+            print("The procedure took ", countSteps, " steps")
+            return
+            
+        # change current state to child
+        currentState = copy.deepcopy(child)  
+
+def display(curr):
+    global countSteps
+    print("Printing the step ",countSteps)
+    for i in curr:
+        for j in i:
+            if len(j) > 0:
+                print ( j ,end =' ')
+        print()
+    print("End of state")
+    print ()
+
+# inputs
+init_state = [[],[],[],['B','C','D','A']]
+goalState = [[],[],[],['A','B','C','D']]
+    
+solution_(init_state,goalState)
+print ("*********END*********")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Solve the following blocks world problem using Steepest Hill Climbing Algorithm.
+#Take the following heuristic function:
+#+n for block resting on the current support structure and n is equal to number of
+blocks below it.
+#-n for block resting on the incurrent support structure and n is equal to number of
+blocks below it
+
+
+
+
+
+# copy imported to use deepcopy function 
+import copy
+# maintaining a global visited to save all visited and avoid repetition & infinite loop condition
+visitedStates = []
+
+# global variable steps to calulate the step count
+countSteps = 0
+
+# this fumction defines the heuristic
+def heuristic(curr_state,goalState):
+    # the final stack with respect to which we calculate the heuristic
+    Target=goalState[3]
+    # initially heuristic value is 0
+    val=0
+    # for each stack in the current state
+    for i in range(len(curr_state)):
+        # the first block in the stack
+        check_val=curr_state[i]
+        # check if the stack has any blocks (length more than 0)
+        if len(check_val)>0:
+            # pick each block in the stack one by one
+            for j in range(len(check_val)):
+                # check if it matches corresponding location in the goal state
+                if check_val[j]!=Target[j]:
+                    # if it does not match then subtract j from heuristic value
+                    # val-=1
+                    val-=j
+                else:
+                    # if it matches then add j to heuristic value
+                    # val+=1
+                    val+=j
+    # return the heuristic value
+    return val
+            
+# this function generates the next state            
+def generate_next(curr_state,prev_heu,goalState):
+    state = copy.deepcopy(curr_state)
+    # choose each stack in the given state
+    for i in range(len(state)):
+        # copy the current state in temp variable
+        temp = copy.deepcopy(state)
+        # for each stack in the state, check if length >=1, ie the stack is not empty
+        if len(temp[i]) > 0:
+            # if condition checks, store and then pop the element from this stack
+            elem = temp[i].pop()
+
+            # for each stack in temp: here we start iterating again 
+            for j in range(len(temp)):
+                # create a copy of temp, and create new state
+                temp1 = copy.deepcopy(temp)
+                # check to make sure we don;t append the element at the same place 
+                # from where we remeoved it, thereby forming hte same state
+                if j != i:
+                    # if not the same position then append
+                    temp1[j].append(elem)
+                    # check if the new state is not in visited array 
+                    if (temp1 not in visitedStates):
+                        # find the current heuristic
+                        curr_heu=heuristic(temp1,goalState)
+                        # compare the heuristic values
+                        if curr_heu>prev_heu:
+                            # if better solution exists then return the newly created state
+                            return temp1
+    
+    # else since no better soln is possible with respect to the current state,
+    # simply return 0, which means a failure
+    return 0
+
+def solution_(initState,goalState):
+    global countSteps
+    global visitedStates
+
+    # checking if initial state is already the final state
+    if (initState == goalState):
+        print (goalState)
+        print("solution found!")
+        return
+    
+    currentState = copy.deepcopy(initState)
+    
+    # loop while goal is found or no better optimal solution is possible
+    while(True):
+
+        # add current state to visited to avoid repetition
+        visitedStates.append(copy.deepcopy(currentState))
+        countSteps+=1
+        display(currentState)
+        prev_heu=heuristic(currentState,goalState)
+
+        # generate possible better child from current state
+        child = generate_next(currentState,prev_heu,goalState)
+        
+        # No more better states are possible
+        if child==0:
+            print("Final state - ",currentState)
+            print("The procedure took ", countSteps, " steps")
+            return
+            
+        # change current state to child
+        currentState = copy.deepcopy(child)  
+
+def display(curr):
+    global countSteps
+    print("Printing the step ",countSteps)
+    for i in curr:
+        for j in i:
+            if len(j) > 0:
+                print ( j ,end =' ')
+        print()
+    print("End of state")
+    print ()
+
+# inputs
+initState = [[],[],['C','A'],['B']]
+goalState = [[],[],[],['A','B','C']]
+    
+solution_(initState,goalState)
+print ("*********END*********")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Solve the following problem using beam search algorithm, by taking
+
+#(i) Beam width =2
+#(ii) Beam width =3
+#Heuristic values are given in the diagram; A is the starting node and G is the goal node.
+
+
+
+
+#BEAM WIDTH = 2
+#copy library to use the deep copy function
+import copy
+#create a list for the tree given
+tree=[['a',-1],['b',1],['c',3],['d',2],['e',2],['f',3],['g',0]]
+#define the beam width
+beam_width = 2
+#this function will search for a solution
+def search(end):
+    #assume initially that the solution is not found
+    #flag value 1 represents not found 
+    #flag value 0 represents found
+    flag=1
+    # this array stores the child nodes 
+    child=[]
+    #this variable breaks the loop for the cases where element is not found in list
+    #so last visited can be at most the length of the list
+    last_visited=0
+    #if the list is reaching the end
+    if(tree[0][0]==end):
+        print("found")
+    #add the child nodes in the child array 
+    child.append(tree[1])
+    child.append(tree[2])
+    # while the state is not found and the value of last visited is valid (less than length of list)
+    while flag and last_visited<len(tree):
+        #sort on the basis of the values in the list inside the list
+        child.sort(key=lambda x:x[1])
+        #shifting the list by beam width 
+        #removing elements in child array at index more than beam width
+        del child[beam_width:]
+        #create an open list 
+        open = copy.deepcopy(child)
+        #clear the child array
+        child=[]
+        #iterate over the child array
+        for i in range(len(open)):
+            #if the end is reached in this open list
+            if open[i][0]==end:
+                # mark this 
+                flag=0
+            else:
+                # find index of this element
+                j=tree.index(open[i])
+                #find the index of left child using standard BST formula
+                leftChild = 2*j+1
+                #find the index of right child using standard BST formula
+                right = 2*j+2
+                #set the last visited to right 
+                #(this is the maximum posiible for the tree) 
+                last_visited=right
+                #check if length of list is more than the last visited node
+                if right<len(tree):
+                    #add elements in the child array
+                    child.append(tree[right])
+                    child.append(tree[leftChild])
+    #check flags for the solution 
+    if not flag:
+        print ("The solution is found")
+    else:
+        print ("The solution is not found")
+
+#call the solution function to reach g
+search('g')
+print ("*********END*********")
